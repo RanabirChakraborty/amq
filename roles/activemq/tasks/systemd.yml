@@ -12,6 +12,26 @@
     mode: '0755'
   become: true
 
+- name: Ensure the audit log directory exists
+  ansible.builtin.file:
+    path: "{{ activemq_main_log_absolute_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+  when: activemq_main_log_absolute_path | default('') | length > 0
+
+- name: Ensure the audit log directory exists
+  ansible.builtin.file:
+    path: "{{ activemq_audit_log_absolute_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+  when: activemq_audit_log_absolute_path | default('') | length > 0
+
 - name: "Configure sysconfig file for {{ activemq.instance_name }} {{ activemq.service_name }} service"
   become: true
   ansible.builtin.template:
