@@ -17,3 +17,11 @@
     mode: '0644'
   become: "{{ activemq_install_requires_become | default(true) }}"
   listen: "touch broker.xml"
+
+- name: "Start handler"
+  ansible.builtin.include_tasks: start.yml
+  listen: "start amq_broker"
+
+- name: "Stop handler"
+  ansible.builtin.include_tasks: stop.yml
+  listen: "stop amq_broker"

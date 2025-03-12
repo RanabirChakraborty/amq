@@ -1,4 +1,8 @@
 ---
+- name: "Stop ActiveMQ broker before upgrading"
+  ansible.builtin.meta: flush_handlers
+  notify: "stop amq_broker"
+
 - name: "Update profile for instance {{ activemq.instance_name }} with new artemis version"
   ansible.builtin.lineinfile:
     path: "{{ activemq.instance_home }}/etc/artemis.profile"
@@ -6,8 +10,6 @@
     line: "ARTEMIS_HOME='{{ activemq.home }}'"
   become: true
   register: broker_updated
-  notify:
-    - restart amq_broker
 
 - name: "Check artemis {{ activemq.home }} activemq schema"
   middleware_automation.common.xml:
@@ -32,3 +34,7 @@
     regexp: '<management-context xmlns=".*">'
     line: "<management-context xmlns=\"{{ activemq_xsd.matches[0]['{http://www.w3.org/2001/XMLSchema}schema'].targetNamespace }}\">"
   become: true
+
+- name: "Ensure broker starts after upgrade"
+  ansible.builtin.meta: flush_handlers
+  notify: "start amq_broker"
