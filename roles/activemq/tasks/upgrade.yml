@@ -19,6 +19,16 @@
   register: activemq_xsd
   become: "{{ activeamq_install_requires_become | default(true) }}"
 
+- name: "Check if bootstrap.xml exists"
+  stat:
+    path: "{{ activemq.instance_home }}/etc/bootstrap.xml"
+  register: bootstrap_file_stat
+  changed_when: false
+
+- name: "Ensure bootstrap.xml is updated properly (only if it exists)"
+  ansible.builtin.include_tasks: tasks/manage_bootstrap.yml
+  when: bootstrap_file_stat.stat.exists
+
 - name: "Ensure bootstrap xsd namespace {{ activemq_xsd.matches[0]['{http://www.w3.org/2001/XMLSchema}schema'].targetNamespace }} is correct for instance {{ activemq.instance_name }}"
   ansible.builtin.replace:
     path: "{{ activemq.instance_home }}/etc/bootstrap.xml"

@@ -1,0 +1,15 @@
+---
+- name: "Backup existing bootstrap.xml"
+  copy:
+    src: "{{ activemq.instance_home }}/etc/bootstrap.xml"
+    dest: "{{ activemq.instance_home }}/etc/bootstrap.xml.bak"
+    remote_src: yes
+    mode: '0644'
+
+- name: "Remove bootstrap.xml to trigger regeneration if needed"
+  file:
+    path: "{{ activemq.instance_home }}/etc/bootstrap.xml"
+    state: absent
+
+- name: "Trigger broker restart if bootstrap.xml was modified"
+  ansible.builtin.meta: flush_handlers
